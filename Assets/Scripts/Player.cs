@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour // MonoBehaviour °ÔÀÓ ·ÎÁ÷ ±¸¼º¿¡ ÇÊ¿äÇÑ °ÍµéÀ» °¡Áø Å¬·¡½º
 {
@@ -8,10 +9,14 @@ public class Player : MonoBehaviour // MonoBehaviour °ÔÀÓ ·ÎÁ÷ ±¸¼º¿¡ ÇÊ¿äÇÑ °Íµ
     public float speed;
 
     Rigidbody2D rigid;
+    SpriteRenderer spriter;
+    Animator anim;
 
     void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();        // GetComponent<T> ¿ÀºêÁ§Æ®¿¡¼­ ÄÄÆ÷³ÍÆ®¸¦ °¡Á®¿À´Â ÇÔ¼ö
+        spriter = GetComponent<SpriteRenderer>();
+        anim = GetComponent<Animator>();
     }
 
     // Start is called before the first frame update
@@ -21,12 +26,14 @@ public class Player : MonoBehaviour // MonoBehaviour °ÔÀÓ ·ÎÁ÷ ±¸¼º¿¡ ÇÊ¿äÇÑ °Íµ
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        inputVec.x = Input.GetAxisRaw("Horizontal");    // GetAxis() ÃàÀÇ °ª / Horizontal ¼öÆò
-        inputVec.y = Input.GetAxisRaw("Vertical");     // GetAxis() ÃàÀÇ °ª / Vertical ¼öÁ÷ 
-        // Input.GetAxis´Â ÀÔ·Â °ªÀÌ ºÎµå·´°Ô ¹Ù²ï´Ù / GetAxisRaw´Â ´õ¿í ¸íÈ®ÇÑ ÄÁÆ®·Ñ ±¸Çö °¡´É(-1 0 1 °°ÀÌ ¸íÈ®ÇÑ °ªÀ¸·Î ¶³¾îÁü)
-    }
+    //void Update()
+    //{
+    //    inputVec.x = Input.GetAxisRaw("Horizontal");    // GetAxis() ÃàÀÇ °ª / Horizontal ¼öÆò
+    //    inputVec.y = Input.GetAxisRaw("Vertical");     // GetAxis() ÃàÀÇ °ª / Vertical ¼öÁ÷ 
+    //    // Input.GetAxis´Â ÀÔ·Â °ªÀÌ ºÎµå·´°Ô ¹Ù²ï´Ù / GetAxisRaw´Â ´õ¿í ¸íÈ®ÇÑ ÄÁÆ®·Ñ ±¸Çö °¡´É(-1 0 1 °°ÀÌ ¸íÈ®ÇÑ °ªÀ¸·Î ¶³¾îÁü)
+    //}
+
+
 
     void FixedUpdate()      // FixedUpdate ¹°¸® ¿¬»ê ÇÁ·¹ÀÓ¸¶´Ù È£ÃâµÇ´Â »ý¸íÁÖ±â ÇÔ¼ö
     {
@@ -43,5 +50,20 @@ public class Player : MonoBehaviour // MonoBehaviour °ÔÀÓ ·ÎÁ÷ ±¸¼º¿¡ ÇÊ¿äÇÑ °Íµ
 
         // 3. À§Ä¡¸¦ ¿Å±ä´Ù / MovePosition / MovePosition´Â À§Ä¡ ÀÌµ¿ÀÌ¶ó ÇöÀç À§Ä¡µµ ´õÇØÁà¾ß ÇÑ´Ù
         rigid.MovePosition(rigid.position + nextVec);
+    }
+
+    void OnMove(InputValue value)       // InputValue Å¸ÀÔÀÇ ¸Å°³º¯¼ö ÀÛ¼º
+    {
+        inputVec = value.Get<Vector2>();
+        // Get<T>: ÇÁ·ÎÇÊ¿¡¼­ ¼³Á¤ÇÑ ÄÁÆ®·Ñ Å¸ÀÔ T °ªÀ» °¡Á®¿À´Â ÇÔ¼ö
+    }
+
+    void LateUpdate()
+    {
+        anim.SetFloat("Speed", inputVec.magnitude);
+        if(inputVec.x != 0)
+        {
+            spriter.flipX = inputVec.x < 0;
+        }
     }
 }
